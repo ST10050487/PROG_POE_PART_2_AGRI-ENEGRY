@@ -8,18 +8,36 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PROG_POE_PART_2_AGRI_ENEGRY.Data;
 using PROG_POE_PART_2_AGRI_ENEGRY.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using System.Text;
+using Microsoft.AspNetCore.WebUtilities;
+using System.Text.Encodings.Web;
+using System.Security.Claims;
+using PROG_POE_PART_2_AGRI_ENEGRY.Areas.Data;
+using PROG_POE_PART_2_AGRI_ENEGRY.Data.Migrations;
 
 namespace PROG_POE_PART_2_AGRI_ENEGRY.Controllers
 {
-    //Code that will only allow the Admin to access the FarmersController
-    [Authorize(Roles = "Employee")]
     public class FarmersController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<PlatformUsers> _userManager;
+        private readonly ILogger<FarmersController> _logger;
+        private readonly IEmailSender _emailSender;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public FarmersController(ApplicationDbContext context)
+        public FarmersController(ApplicationDbContext context,
+                                UserManager<PlatformUsers> userManager,
+                                ILogger<FarmersController> logger,
+                                IEmailSender emailSender,
+                                RoleManager<IdentityRole> roleManager)
         {
             _context = context;
+            _userManager = userManager;
+            _logger = logger;
+            _emailSender = emailSender;
+            _roleManager = roleManager;
         }
 
         // GET: Farmers
@@ -53,20 +71,53 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Controllers
         }
 
         // POST: Farmers/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,FarmerName,FarmerSurname,Age,Email,Password,PhoneNumber,Address")] Farmer farmer)
+
+        public async Task<IActionResult> Create([Bind("FarmerName,FarmerSurname,Age,Email,Password,PhoneNumber,Address")] Farmer farmer)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(farmer);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                var user = new PlatformUsers
+                {
+                    UserName = farmer.Email,
+                    Email = farmer.Email,
+                    Name = farmer.FarmerName,
+                    Surname = farmer.FarmerSurname,
+                    CellPhoneNumber = farmer.PhoneNumber,
+                PhoneNumber = farmer.PhoneNumber,
+                    Cellphone = farmer.PhoneNumber,
+                Address = farmer.Address
+                };
+
+                var result = await _userManager.CreateAsync(user, farmer.Password);
+
+                if (result.Succeeded)
+                {
+                    if (!await _roleManager.RoleExistsAsync("Farmer"))
+                    {
+                        await _roleManager.CreateAsync(new IdentityRole("Farmer"));
+                    }
+                    await _userManager.AddToRoleAsync(user, "Farmer");
+
+                    _logger.LogInformation("User created a new account with password.");
+
+                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new { area = "Identity", userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
+                    await _emailSender.SendEmailAsync(farmer.Email, "Confirm your email",
+                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+
+                    return RedirectToAction(nameof(Index));
+                }
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
             }
             return View(farmer);
         }
+
 
         // GET: Farmers/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -85,8 +136,6 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Controllers
         }
 
         // POST: Farmers/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,FarmerName,FarmerSurname,Age,Email,Password,PhoneNumber,Address")] Farmer farmer)
