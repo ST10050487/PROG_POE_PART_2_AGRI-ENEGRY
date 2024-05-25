@@ -2,6 +2,17 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using PROG_POE_PART_2_AGRI_ENEGRY.Areas.Data;
+using PROG_POE_PART_2_AGRI_ENEGRY.Data;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -10,15 +21,6 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Logging;
-using PROG_POE_PART_2_AGRI_ENEGRY.Areas.Data;
 
 namespace PROG_POE_PART_2_AGRI_ENEGRY.Areas.Identity.Pages.Account
 {
@@ -30,7 +32,8 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<PlatformUsers> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
-        private readonly RoleManager<IdentityRole> _roleManager;  // Add RoleManager
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ApplicationDbContext _context;
 
         public RegisterModel(
             UserManager<PlatformUsers> userManager,
@@ -38,7 +41,8 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Areas.Identity.Pages.Account
             SignInManager<PlatformUsers> signInManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender,
-            RoleManager<IdentityRole> roleManager)  // Add RoleManager to constructor
+            RoleManager<IdentityRole> roleManager,
+            ApplicationDbContext context)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -46,7 +50,8 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
-            _roleManager = roleManager;  // Initialize RoleManager
+            _roleManager = roleManager;
+            _context = context;
         }
 
         [BindProperty]
@@ -57,6 +62,11 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Areas.Identity.Pages.Account
 
         public class InputModel
         {
+            [Required]
+            [DataType(DataType.Text)]
+            [Display(Name = "Employee ID")]
+            public string EmployeeID { get; set; }
+
             [Required]
             [EmailAddress]
             [Display(Name = "Email")]
@@ -107,6 +117,14 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
+                var employeeExists = await _context.EMPLOYEE_IDS.AnyAsync(e => e.EMPLOYEE_ID == Input.EmployeeID);
+
+                if (!employeeExists)
+                {
+                    ModelState.AddModelError(string.Empty, "Employee ID not found.");
+                    return Page();
+                }
+
                 var user = CreateUser();
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
@@ -114,8 +132,8 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Areas.Identity.Pages.Account
                 user.Name = Input.Name;
                 user.Surname = Input.Surname;
                 user.CellPhoneNumber = Input.CellPhoneNumber;
-                user.PhoneNumber = Input.CellPhoneNumber; // Set PhoneNumber explicitly
-                user.Cellphone = Input.CellPhoneNumber; // Set Cellphone explicitly
+                user.PhoneNumber = Input.CellPhoneNumber; 
+                user.Cellphone = Input.CellPhoneNumber; 
                 user.Address = Input.Address;
 
                 var result = await _userManager.CreateAsync(user, Input.Password);
@@ -124,7 +142,6 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Areas.Identity.Pages.Account
                 {
                     _logger.LogInformation("User created a new account with password.");
 
-                    // Assign the "Employee" role to the new user
                     if (!await _roleManager.RoleExistsAsync("Employee"))
                     {
                         await _roleManager.CreateAsync(new IdentityRole("Employee"));
@@ -161,7 +178,6 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Areas.Identity.Pages.Account
 
             return Page();
         }
-
 
         private PlatformUsers CreateUser()
         {
