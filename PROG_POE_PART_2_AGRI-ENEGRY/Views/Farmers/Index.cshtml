@@ -14,59 +14,60 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.FarmerName)
+                Farmer Name
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.FarmerSurname)
+                Farmer Surname
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Age)
+                Age
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Email)
+                Email
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Password)
+                Password
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PhoneNumber)
+                Phone Number
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Address)
+                Address
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.FarmerName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FarmerSurname)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Age)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Password)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PhoneNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Address)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var farmer in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => farmer.FarmerName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => farmer.FarmerSurname)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => farmer.Age)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => farmer.Email)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => farmer.Password)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => farmer.PhoneNumber)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => farmer.Address)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@farmer.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@farmer.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@farmer.Id">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

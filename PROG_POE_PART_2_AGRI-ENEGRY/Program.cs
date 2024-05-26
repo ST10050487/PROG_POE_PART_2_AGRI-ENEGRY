@@ -14,7 +14,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 // Configure Identity with roles and default Identity user
-builder.Services.AddDefaultIdentity<PlatformUsers>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<PlatformUsers>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddRoles<IdentityRole>()  // Adding support for roles
     .AddEntityFrameworkStores<ApplicationDbContext>();
 

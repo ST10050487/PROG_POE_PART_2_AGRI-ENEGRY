@@ -2,7 +2,7 @@
 {
     public class EmployeeID
     {
-        public int Id { get; set; }  // Primary Key
+        public int Id { get; set; } 
         public string EMPLOYEE_ID { get; set; }
         public string EMPLOYEE { get; set; }
     }

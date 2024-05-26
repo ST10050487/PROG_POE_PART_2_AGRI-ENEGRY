@@ -19,6 +19,7 @@ using PROG_POE_PART_2_AGRI_ENEGRY.Data.Migrations;
 
 namespace PROG_POE_PART_2_AGRI_ENEGRY.Controllers
 {
+    [Authorize(Roles = "Employee")]
     public class FarmersController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -43,8 +44,10 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Controllers
         // GET: Farmers
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Farmer.ToListAsync());
+            var farmers = await _context.Farmer.ToListAsync();
+            return View(farmers);
         }
+
 
         // GET: Farmers/Details/5
         public async Task<IActionResult> Details(int? id)
