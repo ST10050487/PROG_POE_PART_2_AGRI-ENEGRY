@@ -15,9 +15,10 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Models
         public string? Name { get; set; }
 
         [Display(Name = "Product Picture")]
-        public string? PictureUrl { get; set; }
+        public byte[] PictureData { get; set; }
 
         [Display(Name = "Product Price")]
+        [DataType(DataType.Currency)]
         public int Price { get; set; }
 
         [Required]

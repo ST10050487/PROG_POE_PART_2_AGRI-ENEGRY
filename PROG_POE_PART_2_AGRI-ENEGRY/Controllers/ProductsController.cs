@@ -1,78 +1,79 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
+using PROG_POE_PART_2_AGRI_ENEGRY.Areas.Data;
 using PROG_POE_PART_2_AGRI_ENEGRY.Data;
 using PROG_POE_PART_2_AGRI_ENEGRY.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PROG_POE_PART_2_AGRI_ENEGRY.Controllers
 {
+    [Authorize(Roles = "Farmer")]
     public class ProductsController : Controller
     {
         private readonly ApplicationDbContext _context;
-
-        public ProductsController(ApplicationDbContext context)
+        private readonly UserManager<PlatformUsers> _userManager;
+        private string userID;
+        public ProductsController(ApplicationDbContext context, UserManager<PlatformUsers> userManager)
         {
             _context = context;
-        }
-
-        // GET: Products
-        public async Task<IActionResult> Index()
-        {
-            var applicationDbContext = _context.Product.Include(p => p.Category).Include(p => p.User);
-            return View(await applicationDbContext.ToListAsync());
-        }
-
-        // GET: Products/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var product = await _context.Product
-                .Include(p => p.Category)
-                .Include(p => p.User)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            return View(product);
+            _userManager = userManager;
         }
 
         // GET: Products/Create
         public IActionResult Create()
         {
-            ViewData["CategoryId"] = new SelectList(_context.Set<Category>(), "Id", "CategoryName");
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
+            ViewData["Categories"] = new SelectList(_context.Categories, "Id", "CategoryName");
             return View();
         }
 
         // POST: Products/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,PictureUrl,Price,ProductionDate,UserId,CategoryId")] Product product)
+        public async Task<IActionResult> Create([Bind("Id,Name,Price,ProductionDate,CategoryId")] Product product, IFormFile PictureData)
         {
-            if (ModelState.IsValid)
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
             {
-                _context.Add(product);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Login", "Account");
             }
-            ViewData["CategoryId"] = new SelectList(_context.Set<Category>(), "Id", "CategoryName", product.CategoryId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", product.UserId);
+
+            product.UserId = user.Id;
+            product.User = user;
+            userID = user.Id;
+            if (PictureData != null && PictureData.Length > 0)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    await PictureData.CopyToAsync(memoryStream);
+                    product.PictureData = memoryStream.ToArray();
+                }
+            }
+            else
+            {
+                // Set default image data if no image is uploaded
+                product.PictureData = GetDefaultImageData();
+            }
+
+            product.CategoryId = product.CategoryId;
+            product.Category = _context.Categories.Find(product.CategoryId);
+
+            _context.Add(product);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+
+            ViewData["Categories"] = new SelectList(_context.Categories, "Id", "CategoryName", product.CategoryId);
             return View(product);
         }
 
-        // GET: Products/Edit/5
+        // GET: Products/Edit/1
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -85,50 +86,69 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Controllers
             {
                 return NotFound();
             }
-            ViewData["CategoryId"] = new SelectList(_context.Set<Category>(), "Id", "CategoryName", product.CategoryId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", product.UserId);
+
+            // Get the current logged-in user
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            var category = _context.Categories.Find(product.CategoryId);
+            // Assuming you want to populate dropdown lists for UserId and CategoryId
+            // Set the UserId directly to the user's Id
+            product.UserId = user.Id;
+            product.CategoryId = category.Id;
+            ViewBag.UserId = new SelectList(_context.Users.Where(u => u.Id != null), "Id", "UserName", product.UserId);
+            ViewBag.CategoryId = new SelectList(_context.Categories, "Id", "CategoryName", product.CategoryId);
+
             return View(product);
         }
 
-        // POST: Products/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,PictureUrl,Price,ProductionDate,UserId,CategoryId")] Product product)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Price,ProductionDate,CategoryId,UserId")] Product product, IFormFile PictureData)
         {
+            var user = await _userManager.GetUserAsync(User); 
             if (id != product.Id)
             {
                 return NotFound();
             }
+            product.UserId = user.Id;
+            product.User = user;
+            userID = user.Id;
 
-            if (ModelState.IsValid)
+            if (PictureData != null && PictureData.Length > 0)
             {
-                try
+                using (var memoryStream = new MemoryStream())
                 {
-                    _context.Update(product);
-                    await _context.SaveChangesAsync();
+                    await PictureData.CopyToAsync(memoryStream);
+                    product.PictureData = memoryStream.ToArray();
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ProductExists(product.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_context.Set<Category>(), "Id", "CategoryName", product.CategoryId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", product.UserId);
+            else
+            {
+                // Set default image data if no image is uploaded
+                product.PictureData = GetDefaultImageData();
+            }
+
+            product.CategoryId = product.CategoryId;
+                product.Category = _context.Categories.Find(product.CategoryId);
+
+                _context.Update(product);
+                    await _context.SaveChangesAsync();
+
+                return RedirectToAction(nameof(Index));
+
+
+            // Repopulating dropdown lists if ModelState is not valid
+            ViewBag.UserId = new SelectList(_context.Users, "Id", "UserName", product.UserId);
+            ViewBag.CategoryId = new SelectList(_context.Categories, "Id", "CategoryName", product.CategoryId);
+
             return View(product);
         }
 
-        // GET: Products/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // GET: Products/Details/1
+        public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
@@ -136,9 +156,10 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Controllers
             }
 
             var product = await _context.Product
-                .Include(p => p.Category)
                 .Include(p => p.User)
+                .Include(p => p.Category)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (product == null)
             {
                 return NotFound();
@@ -147,8 +168,45 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Controllers
             return View(product);
         }
 
-        // POST: Products/Delete/5
-        [HttpPost, ActionName("Delete")]
+        // GET: Products/GetImage/1
+        public async Task<IActionResult> GetImage(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var product = await _context.Product.FirstOrDefaultAsync(m => m.Id == id);
+            if (product == null || product.PictureData == null)
+            {
+                return NotFound();
+            }
+
+            return File(product.PictureData, "image/jpeg"); 
+        }
+        // GET: Products/Delete/1
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var product = await _context.Product
+                .Include(p => p.User)
+                .Include(p => p.Category)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            return View(product);
+        }
+
+        // POST: Products/Delete/1
+        [HttpPost, ActionName("DeleteConfirmed")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
@@ -156,15 +214,28 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Controllers
             if (product != null)
             {
                 _context.Product.Remove(product);
+                await _context.SaveChangesAsync();
             }
-
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+
+        private byte[] GetDefaultImageData()
+        {
+            throw new NotImplementedException();
         }
 
         private bool ProductExists(int id)
         {
             return _context.Product.Any(e => e.Id == id);
         }
+
+        // GET: Products
+        public async Task<IActionResult> Index()
+        {
+            var products = await _context.Product.ToListAsync();
+            return View(products);
+        }
     }
 }
+

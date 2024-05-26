@@ -1,5 +1,7 @@
 ﻿@model PROG_POE_PART_2_AGRI_ENEGRY.Models.Product
 
+@using System.Security.Claims
+
 @{
     ViewData["Title"] = "Edit";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -11,7 +13,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <form asp-action="Edit" method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
@@ -20,9 +22,9 @@
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="PictureUrl" class="control-label"></label>
-                <input asp-for="PictureUrl" class="form-control" />
-                <span asp-validation-for="PictureUrl" class="text-danger"></span>
+                <label asp-for="PictureData" class="control-label"></label>
+                <input type="file" asp-for="PictureData" class="form-control" />
+                <span asp-validation-for="PictureData" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Price" class="control-label"></label>
@@ -33,11 +35,6 @@
                 <label asp-for="ProductionDate" class="control-label"></label>
                 <input asp-for="ProductionDate" class="form-control" />
                 <span asp-validation-for="ProductionDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="UserId" class="control-label"></label>
-                <select asp-for="UserId" class="form-control" asp-items="ViewBag.UserId"></select>
-                <span asp-validation-for="UserId" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="CategoryId" class="control-label"></label>
@@ -56,5 +53,8 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
+
