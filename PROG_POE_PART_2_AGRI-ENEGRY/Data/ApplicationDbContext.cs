@@ -13,5 +13,6 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Data
         }
         public DbSet<PROG_POE_PART_2_AGRI_ENEGRY.Models.Farmer> Farmer { get; set; } = default!;
         public DbSet<PROG_POE_PART_2_AGRI_ENEGRY.Models.EmployeeID> EMPLOYEE_IDS { get; set; } = default!;
+        public DbSet<PROG_POE_PART_2_AGRI_ENEGRY.Models.Product> Product { get; set; } = default!;
     }
 }
