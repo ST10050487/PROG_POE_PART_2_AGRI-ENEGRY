@@ -1,65 +1,78 @@
 ﻿@model PROG_POE_PART_2_AGRI_ENEGRY.Models.Product
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Product Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Details</h1>
+<div class="container mt-5">
+    <h1 class="mb-4">@ViewData["Title"]</h1>
 
-<div>
-    <h4>Product</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class="col-sm-2">
-            Picture
-        </dt>
-        <dd class="col-sm-10">
-            <img src="@Url.Action("GetImage", "Products", new { id = Model.Id })" style="max-width: 100px; max-height: 100px;" />
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Price)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Price)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.ProductionDate)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.ProductionDate)
-        </dd>
-        <!-- Display the user's name and surname -->
-        <dt class="col-sm-2">
-            User
-        </dt>
-        <dd class="col-sm-10">
-            @Model.User?.Name @Model.User?.Surname
-        </dd>
-        <!-- Display the category name -->
-        <dt class="col-sm-2">
-            Category
-        </dt>
-        <dd class="col-sm-10">
-            @if (Model.Category != null)
-            {
-                @Html.DisplayFor(model => model.Category.CategoryName)
-            }
-            else
-            {
-                <span>No Category</span>
-            }
-        </dd>
-    </dl>
+    <div class="card">
+        <div class="card-header card-header-custom">
+            Product Details
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3 font-weight-bold">
+                    @Html.DisplayNameFor(model => model.Name)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Name)
+                </dd>
+
+                <dt class="col-sm-3 font-weight-bold">
+                    Picture
+                </dt>
+                <dd class="col-sm-9">
+                    <img src="@Url.Action("GetImage", "Products", new { id = Model.Id })" class="img-fluid" style="max-width: 150px; max-height: 150px;" />
+                </dd>
+
+                <dt class="col-sm-3 font-weight-bold">
+                    @Html.DisplayNameFor(model => model.Price)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Price)
+                </dd>
+
+                <dt class="col-sm-3 font-weight-bold">
+                    @Html.DisplayNameFor(model => model.ProductionDate)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.ProductionDate)
+                </dd>
+
+                <dt class="col-sm-3 font-weight-bold">
+                    User
+                </dt>
+                <dd class="col-sm-9">
+                    @Model.User?.Name @Model.User?.Surname
+                </dd>
+
+                <dt class="col-sm-3 font-weight-bold">
+                    Category
+                </dt>
+                <dd class="col-sm-9">
+                    @if (Model.Category != null)
+                    {
+                        @Html.DisplayFor(model => model.Category.CategoryName)
+                    }
+                    else
+                    {
+                        <span>No Category</span>
+                    }
+                </dd>
+            </dl>
+        </div>
+        <div class="card-footer">
+            <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-custom">Edit</a>
+            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        </div>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a> |
-    <a asp-controller="Products" asp-action="Details" asp-route-id="@Model?.Id">Details</a>
-</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

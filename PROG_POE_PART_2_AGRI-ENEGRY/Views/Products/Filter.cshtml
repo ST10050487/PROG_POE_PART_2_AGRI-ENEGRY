@@ -1,0 +1,77 @@
+﻿@model PROG_POE_PART_2_AGRI_ENEGRY.Models.ProductFilterViewModel
+
+@{
+    ViewData["Title"] = "Filter Products";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Filter Products</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Filter" method="get">
+            <div class="form-group">
+                <label asp-for="StartDate" class="control-label">Start Date</label>
+                <input asp-for="StartDate" class="form-control" type="date" />
+            </div>
+            <div class="form-group">
+                <label asp-for="EndDate" class="control-label">End Date</label>
+                <input asp-for="EndDate" class="form-control" type="date" />
+            </div>
+            <div class="form-group">
+                <label asp-for="CategoryId" class="control-label">Category</label>
+                <select asp-for="CategoryId" class="form-control" asp-items="Model.Categories">
+                    <option value="">All Categories</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label asp-for="FarmerId" class="control-label">Farmer</label>
+                <select asp-for="FarmerId" class="form-control" asp-items="Model.Farmers">
+                    <option value="">All Farmers</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </form>
+    </div>
+</div>
+
+<hr />
+
+<h2>Product List</h2>
+
+@if (!Model.Products.Any())
+{
+    <p style="color: red;">No Products Found</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Production Date</th>
+                    <th>Category</th>
+                    <th>Seller</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var product in Model.Products)
+                {
+                    <tr>
+                        <td><img src="@Url.Action("GetImage", "Products", new { id = product.Id })" class="img-thumbnail" style="max-width: 100px; max-height: 100px;" /></td>
+                        <td>@Html.DisplayFor(modelItem => product.Name)</td>
+                        <td>@Html.DisplayFor(modelItem => product.Price)</td>
+                        <td>@Html.DisplayFor(modelItem => product.ProductionDate)</td>
+                        <td>@Html.DisplayFor(modelItem => product.Category.CategoryName)</td>
+                        <td>@product.User.Name @product.User.Surname</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+

@@ -3,12 +3,27 @@ using Microsoft.EntityFrameworkCore;
 using PROG_POE_PART_2_AGRI_ENEGRY.Areas.Data;
 using PROG_POE_PART_2_AGRI_ENEGRY.Data;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.IO;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Set the DataDirectory path
+string dataDirectoryPath = Path.Combine(builder.Environment.ContentRootPath, "App_Data");
+if (!Directory.Exists(dataDirectoryPath))
+{
+    Directory.CreateDirectory(dataDirectoryPath);
+}
+AppDomain.CurrentDomain.SetData("DataDirectory", dataDirectoryPath);
+Console.WriteLine($"DataDirectory path: {dataDirectoryPath}");
 
 // Configure the ApplicationDbContext for Identity
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
+// Replace the placeholder with the resolved DataDirectory path
+connectionString = connectionString.Replace("|DataDirectory|", dataDirectoryPath);
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -90,6 +105,10 @@ using (var scope = app.Services.CreateScope())
             else
             {
                 // Handle creation failure (e.g., log errors)
+                foreach (var error in result.Errors)
+                {
+                    Console.WriteLine($"Error creating admin user: {error.Description}");
+                }
             }
         }
     }
@@ -98,7 +117,6 @@ using (var scope = app.Services.CreateScope())
         // Log the exception or handle it appropriately
         Console.WriteLine($"An error occurred while creating the admin user: {ex.Message}");
     }
-
 }
 
 app.Run();

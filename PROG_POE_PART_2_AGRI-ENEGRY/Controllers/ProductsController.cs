@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace PROG_POE_PART_2_AGRI_ENEGRY.Controllers
 {
-    [Authorize(Roles = "Farmer")]
+    [Authorize(Roles = "Farmer,Employee")]
     public class ProductsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -26,14 +26,14 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Controllers
             _context = context;
             _userManager = userManager;
         }
-
+        [Authorize(Roles = "Farmer")]
         // GET: Products/Create
         public IActionResult Create()
         {
             ViewData["Categories"] = new SelectList(_context.Categories, "Id", "CategoryName");
             return View();
         }
-
+        [Authorize(Roles = "Farmer")]
         // POST: Products/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -72,7 +72,7 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Controllers
             ViewData["Categories"] = new SelectList(_context.Categories, "Id", "CategoryName", product.CategoryId);
             return View(product);
         }
-
+        [Authorize(Roles = "Farmer")]
         // GET: Products/Edit/1
         public async Task<IActionResult> Edit(int? id)
         {
@@ -103,7 +103,7 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Controllers
 
             return View(product);
         }
-
+        [Authorize(Roles = "Farmer")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Price,ProductionDate,CategoryId,UserId")] Product product, IFormFile PictureData)
@@ -146,7 +146,7 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Controllers
 
             return View(product);
         }
-
+        [Authorize(Roles = "Farmer")]
         // GET: Products/Details/1
         public async Task<IActionResult> Details(int? id)
         {
@@ -167,7 +167,7 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Controllers
 
             return View(product);
         }
-
+        [Authorize(Roles ="Farmer,Employee")]
         // GET: Products/GetImage/1
         public async Task<IActionResult> GetImage(int? id)
         {
@@ -184,6 +184,7 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Controllers
 
             return File(product.PictureData, "image/jpeg"); 
         }
+        [Authorize(Roles = "Farmer")]
         // GET: Products/Delete/1
         public async Task<IActionResult> Delete(int? id)
         {
@@ -204,7 +205,7 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Controllers
 
             return View(product);
         }
-
+        [Authorize(Roles = "Farmer")]
         // POST: Products/Delete/1
         [HttpPost, ActionName("DeleteConfirmed")]
         [ValidateAntiForgeryToken]
@@ -219,6 +220,70 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Roles = "Employee")]
+        public async Task<IActionResult> Filter(ProductFilterViewModel filter)
+        {
+            var query = _context.Product.Include(p => p.Category).Include(p => p.User).AsQueryable();
+
+            if (filter.StartDate.HasValue)
+            {
+                query = query.Where(p => p.ProductionDate >= filter.StartDate.Value);
+            }
+
+            if (filter.EndDate.HasValue)
+            {
+                query = query.Where(p => p.ProductionDate <= filter.EndDate.Value);
+            }
+
+            if (filter.CategoryId.HasValue)
+            {
+                query = query.Where(p => p.CategoryId == filter.CategoryId.Value);
+            }
+
+            // If the user selects a specific farmer
+            if (!string.IsNullOrEmpty(filter.FarmerId))
+            {
+                query = query.Where(p => p.UserId == filter.FarmerId);
+            }
+
+            // Populate the Farmer dropdown with options for filtering
+            var farmers = await _userManager.GetUsersInRoleAsync("Farmer");
+            filter.Farmers = new SelectList(farmers.Select(f => new SelectListItem
+            {
+                Text = $"{f.Name} {f.Surname}", // Concatenate name and surname
+                Value = f.Id // Use user ID as the value
+            }), "Value", "Text");
+
+            filter.Products = await query.ToListAsync();
+            filter.Categories = new SelectList(await _context.Categories.ToListAsync(), "Id", "CategoryName");
+
+            return View(filter);
+        }
+
+
+
+
+
+        [Authorize(Roles = "Farmer")]
+        public async Task<IActionResult> Index()
+        {
+            // Get the current logged-in user
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            // Filter products by the logged-in user's ID
+            var products = await _context.Product
+                .Include(p => p.Category)
+                .Include(p => p.User)
+                .Where(p => p.UserId == user.Id)
+                .ToListAsync();
+
+            return View(products);
+        }
+
 
         private byte[] GetDefaultImageData()
         {
@@ -228,13 +293,6 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Controllers
         private bool ProductExists(int id)
         {
             return _context.Product.Any(e => e.Id == id);
-        }
-
-        // GET: Products
-        public async Task<IActionResult> Index()
-        {
-            var products = await _context.Product.ToListAsync();
-            return View(products);
         }
     }
 }

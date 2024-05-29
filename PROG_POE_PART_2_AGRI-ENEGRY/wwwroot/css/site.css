@@ -1,22 +1,65 @@
+/* Custom styles for card header */
+.card-header-custom {
+    background-color: #007bff;
+    color: white;
+}
+
+/* Custom styles for buttons */
+.btn-custom {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+    .btn-custom:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+    }
+
+/* Make form labels bold */
+.form-group label {
+    font-weight: bold;
+}
+
+/* Custom alert styles */
+.alert-custom {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Responsive font size */
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+/* Focus styles */
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
+/* Ensure the page uses the full height */
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
+/* Add margin at the bottom of the body */
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+}
+
+/* Style for the logo image */
+.logo-img {
+    max-width: 80px; /* Adjust the width as needed */
+    height: auto;
+    margin-right: 10px; /* Add margin for spacing */
 }
