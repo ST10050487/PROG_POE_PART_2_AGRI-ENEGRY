@@ -4,6 +4,7 @@ using System.Diagnostics;
 
 namespace PROG_POE_PART_2_AGRI_ENEGRY.Controllers
 {
+    [Microsoft.AspNetCore.Authorization.Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -23,6 +24,10 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Controllers
             return View();
         }
         public IActionResult Privacy()
+        {
+            return View();
+        }
+        public IActionResult Market()
         {
             return View();
         }

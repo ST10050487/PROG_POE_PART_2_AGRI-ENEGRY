@@ -1,9 +1,51 @@
 ﻿@{
+    Layout = "_Layout";
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-    <p> This Website Is A Product Of Code-X. Code-X, A Tanaka Industries Company</p>
+<div class="container mt-4">
+    <div class="text-center">
+        <h1 class="display-4">Welcome</h1>
+        <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+        <p>This Website Is A Product Of Code-X. Code-X, A Tanaka Industries Company</p>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-4 mb-4">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Add Farms</h5>
+                    <p class="card-text">Add New Farmers.</p>
+                    <a class="btn btn-custom" asp-area="" asp-controller="Farmers" asp-action="Create">Go to Add Farms</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Add Products</h5>
+                    <p class="card-text">Sell Product.</p>
+                    <a class="btn btn-custom" asp-area="" asp-controller="Products" asp-action="Create">Go to Add Products</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <h5 class="card-title">View and Filter Products</h5>
+                    <p class="card-text">View and Filter Avaiable Products.</p>
+                    <a class="btn btn-custom" asp-area="" asp-controller="Products" asp-action="Filter">Go to View and Filter Products</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Market</h5>
+                    <p class="card-text">Buy Green Energy Products For Agricultural Farming.</p>
+                    <a class="btn btn-custom" asp-controller="Home" asp-action="Market">Go to Market</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
