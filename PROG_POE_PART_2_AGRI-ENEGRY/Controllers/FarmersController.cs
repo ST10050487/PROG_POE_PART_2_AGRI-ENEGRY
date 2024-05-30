@@ -22,11 +22,8 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Controllers
     [Authorize(Roles = "Employee")]
     public class FarmersController : Controller
     {
-        private readonly ApplicationDbContext _context;
         private readonly UserManager<PlatformUsers> _userManager;
-        private readonly ILogger<FarmersController> _logger;
-        private readonly IEmailSender _emailSender;
-        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ApplicationDbContext _context;
 
         public FarmersController(ApplicationDbContext context,
                                 UserManager<PlatformUsers> userManager,
@@ -41,15 +38,27 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Controllers
             _roleManager = roleManager;
         }
 
-        // GET: Farmers
+        private readonly ILogger<FarmersController> _logger;
+        private readonly IEmailSender _emailSender;
+        private readonly RoleManager<IdentityRole> _roleManager;
+
         public async Task<IActionResult> Index()
         {
-            var farmers = await _context.Farmer.ToListAsync();
-            return View(farmers);
+            var farmerUsers = await _userManager.GetUsersInRoleAsync("Farmer");
+            var applicationUsers = farmerUsers.Select(u => new ApplicationUser
+            {
+                UserName = u.UserName,
+                Email = u.Email,
+                Name = u.Name,
+                Surname = u.Surname,
+                PhoneNumber = u.PhoneNumber,
+                Address = u.Address
+            }).ToList();
+
+            return View(applicationUsers);
         }
 
 
-        // GET: Farmers/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -67,16 +76,13 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Controllers
             return View(farmer);
         }
 
-        // GET: Farmers/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Farmers/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-
         public async Task<IActionResult> Create([Bind("FarmerName,FarmerSurname,Age,Email,Password,PhoneNumber,Address")] Farmer farmer)
         {
             if (ModelState.IsValid)
@@ -88,9 +94,9 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Controllers
                     Name = farmer.FarmerName,
                     Surname = farmer.FarmerSurname,
                     CellPhoneNumber = farmer.PhoneNumber,
-                PhoneNumber = farmer.PhoneNumber,
+                    PhoneNumber = farmer.PhoneNumber,
                     Cellphone = farmer.PhoneNumber,
-                Address = farmer.Address
+                    Address = farmer.Address
                 };
 
                 var result = await _userManager.CreateAsync(user, farmer.Password);
@@ -121,8 +127,6 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Controllers
             return View(farmer);
         }
 
-
-        // GET: Farmers/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -138,7 +142,6 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Controllers
             return View(farmer);
         }
 
-        // POST: Farmers/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,FarmerName,FarmerSurname,Age,Email,Password,PhoneNumber,Address")] Farmer farmer)
@@ -171,7 +174,6 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Controllers
             return View(farmer);
         }
 
-        // GET: Farmers/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -189,7 +191,6 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Controllers
             return View(farmer);
         }
 
-        // POST: Farmers/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

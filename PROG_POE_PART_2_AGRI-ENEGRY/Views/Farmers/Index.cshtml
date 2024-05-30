@@ -1,73 +1,152 @@
-﻿@model IEnumerable<PROG_POE_PART_2_AGRI_ENEGRY.Models.Farmer>
+﻿@model IEnumerable<PROG_POE_PART_2_AGRI_ENEGRY.Controllers.ApplicationUser>
 
-@{
-    ViewData["Title"] = "Farmers";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
 
-<h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                Farmer Name
-            </th>
-            <th>
-                Farmer Surname
-            </th>
-            <th>
-                Age
-            </th>
-            <th>
-                Email
-            </th>
-            <th>
-                Password
-            </th>
-            <th>
-                Phone Number
-            </th>
-            <th>
-                Address
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var farmer in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => farmer.FarmerName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => farmer.FarmerSurname)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => farmer.Age)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => farmer.Email)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => farmer.Password)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => farmer.PhoneNumber)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => farmer.Address)
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@farmer.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@farmer.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@farmer.Id">Delete</a>
-                </td>
-            </tr>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - Farmers</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <style>
+        /* Custom styles for card header */
+        .card-header-custom {
+            background-color: #007bff;
+            color: white;
         }
-    </tbody>
-</table>
+
+        /* Custom styles for buttons */
+        .btn-custom {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+
+        .btn-custom:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+        }
+
+        /* Make form labels bold */
+        .form-group label {
+            font-weight: bold;
+        }
+
+        /* Custom alert styles */
+        .alert-custom {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Responsive font size */
+        html {
+            font-size: 14px;
+        }
+
+
+        /* Focus styles */
+        .btn:focus,
+        .btn:active:focus,
+        .btn-link.nav-link:focus,
+        .form-control:focus,
+        .form-check-input:focus {
+            box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+        }
+
+        /* Ensure the page uses the full height */
+        html {
+            position: relative;
+            min-height: 100%;
+        }
+
+        /* Add margin at the bottom of the body */
+        body {
+            margin-bottom: 60px;
+        }
+
+        /* Style for the logo image */
+        .logo-img {
+            max-width: 80px; /* Adjust the width as needed */
+            height: auto;
+            margin-right: 10px; /* Add margin for spacing */
+        }
+
+        /* Custom styles for the product list */
+        .product-image {
+            max-width: 100px;
+            max-height: 100px;
+        }
+
+        .table-custom th,
+        .table-custom td {
+            vertical-align: middle;
+        }
+
+        .table-actions a {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="#">Farmers</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-action="Create">Create New</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header card-header-custom">
+                Farmers List
+            </div>
+            <div class="card-body">
+                <table class="table table-striped table-custom">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>UserName</th>
+                            <th>Email</th>
+                            <th>Name</th>
+                            <th>Surname</th>
+                            <th>PhoneNumber</th>
+                            <th>Address</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var farmer in Model)
+                        {
+                            <tr>
+                                <td>@Html.DisplayFor(modelItem => farmer.UserName)</td>
+                                <td>@Html.DisplayFor(modelItem => farmer.Email)</td>
+                                <td>@Html.DisplayFor(modelItem => farmer.Name)</td>
+                                <td>@Html.DisplayFor(modelItem => farmer.Surname)</td>
+                                <td>@Html.DisplayFor(modelItem => farmer.PhoneNumber)</td>
+                                <td>@Html.DisplayFor(modelItem => farmer.Address)</td>
+                                <td class="table-actions">
+                                    <a href="@Url.Action("Edit", new { id = farmer.Id })" class="btn btn-sm btn-outline-primary">Edit</a>
+                                    <a href="@Url.Action("Details", new { id = farmer.Id })" class="btn btn-sm btn-outline-info">Details</a>
+                                    <a href="@Url.Action("Delete", new { id = farmer.Id })" class="btn btn-sm btn-outline-danger">Delete</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+
+</body>
+</html>

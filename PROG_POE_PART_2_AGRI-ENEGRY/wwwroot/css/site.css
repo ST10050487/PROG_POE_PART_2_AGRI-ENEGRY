@@ -55,6 +55,7 @@ html {
 /* Add margin at the bottom of the body */
 body {
     margin-bottom: 60px;
+    background-color: #f5f5f5; /* Light grey background color */
 }
 
 /* Style for the logo image */
@@ -62,4 +63,19 @@ body {
     max-width: 80px; /* Adjust the width as needed */
     height: auto;
     margin-right: 10px; /* Add margin for spacing */
+}
+
+/* Custom styles for the product list */
+.product-image {
+    max-width: 100px;
+    max-height: 100px;
+}
+
+.table-custom th,
+.table-custom td {
+    vertical-align: middle;
+}
+
+.table-actions a {
+    margin-right: 10px;
 }
