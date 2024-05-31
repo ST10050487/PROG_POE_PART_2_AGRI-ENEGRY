@@ -5,18 +5,17 @@
 
 <div class="container mt-4">
     <div class="text-center">
-        <h1 class="display-4">Welcome</h1>
-        <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-        <p>This Website Is A Product Of Code-X. Code-X, A Tanaka Industries Company</p>
+        <h1 class="display-4">Welcome to Agri-Energy Connect</h1>
+        <p class="lead">Empowering Sustainable Agriculture Through Technology</p>
     </div>
 
     <div class="row mt-4">
         <div class="col-md-4 mb-4">
             <div class="card text-center h-100">
                 <div class="card-body">
-                    <h5 class="card-title">Add Farms</h5>
-                    <p class="card-text">Add New Farmers.</p>
-                    <a class="btn btn-custom" asp-area="" asp-controller="Farmers" asp-action="Create">Go to Add Farms</a>
+                    <h5 class="card-title">Add Farmer</h5>
+                    <p class="card-text">Start by adding new farmers and their farmer.</p>
+                    <a class="btn btn-custom" asp-area="" asp-controller="Farmers" asp-action="Create">Go to Add Farmers</a>
                 </div>
             </div>
         </div>
@@ -24,7 +23,7 @@
             <div class="card text-center h-100">
                 <div class="card-body">
                     <h5 class="card-title">Add Products</h5>
-                    <p class="card-text">Sell Product.</p>
+                    <p class="card-text">Sell your agricultural products online.</p>
                     <a class="btn btn-custom" asp-area="" asp-controller="Products" asp-action="Create">Go to Add Products</a>
                 </div>
             </div>
@@ -33,7 +32,7 @@
             <div class="card text-center h-100">
                 <div class="card-body">
                     <h5 class="card-title">View and Filter Products</h5>
-                    <p class="card-text">View and Filter Avaiable Products.</p>
+                    <p class="card-text">Explore available products and filter them based on your preferences.</p>
                     <a class="btn btn-custom" asp-area="" asp-controller="Products" asp-action="Filter">Go to View and Filter Products</a>
                 </div>
             </div>
@@ -42,7 +41,7 @@
             <div class="card text-center h-100">
                 <div class="card-body">
                     <h5 class="card-title">Market</h5>
-                    <p class="card-text">Buy Green Energy Products For Agricultural Farming.</p>
+                    <p class="card-text">Buy and sell green energy products for agricultural farming.</p>
                     <a class="btn btn-custom" asp-controller="Home" asp-action="Market">Go to Market</a>
                 </div>
             </div>
@@ -51,10 +50,25 @@
             <div class="card text-center h-100">
                 <div class="card-body">
                     <h5 class="card-title">Educational Resources</h5>
-                    <p class="card-text">Learn About Sustainable Farming.</p>
+                    <p class="card-text">Learn about sustainable farming practices and technologies.</p>
                     <a class="btn btn-custom" asp-controller="Home" asp-action="EducationalResources">Go to Learning Resources</a>
                 </div>
             </div>
         </div>
+        <div class="col-md-4 mb-4">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Farming Hub</h5>
+                    <p class="card-text">Connect and collaborate with farmers worldwide.</p>
+                    <a class="btn btn-custom" asp-controller="Home" asp-action="Hub">Go to Farming Hub</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col text-center">
+            <p>This Website Is A Product Of Code-X. Code-X, A Tanaka Industries Company</p>
+        </div>
     </div>
 </div>
+

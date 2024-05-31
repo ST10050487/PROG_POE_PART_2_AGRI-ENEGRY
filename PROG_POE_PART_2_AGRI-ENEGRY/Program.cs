@@ -28,17 +28,17 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-// Configure Identity with roles and default Identity user
+// Configuring Identity with roles and default Identity user
 builder.Services.AddDefaultIdentity<PlatformUsers>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddRoles<IdentityRole>()  // Adding support for roles
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
-// Add services to the container
+// Adding services to the container
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline
+// Configuring the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
@@ -55,7 +55,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthentication(); // Ensure authentication is added to the pipeline
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
@@ -63,13 +63,13 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
 
-// Create Roles and assign default User to a Role
+// Creating Roles and assigning default User to a Role
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<PlatformUsers>>();
 
-    // Ensure the roles are created
+    // Ensuring the roles are created
     string[] roles = { "Admin", "Employee", "Farmer", "Visitor" };
     foreach (var role in roles)
     {
@@ -79,7 +79,7 @@ using (var scope = app.Services.CreateScope())
         }
     }
 
-    // Ensure default admin user is created and assigned Admin role
+    // Ensuring default admin user is created and assigned Admin role
     string adminEmail = "admin@admin.com";
     string adminPassword = "Admin@1234";
     try
@@ -104,7 +104,7 @@ using (var scope = app.Services.CreateScope())
             }
             else
             {
-                // Handle creation failure (e.g., log errors)
+                // Handling creation failure (e.g., log errors)
                 foreach (var error in result.Errors)
                 {
                     Console.WriteLine($"Error creating admin user: {error.Description}");
@@ -114,9 +114,8 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception ex)
     {
-        // Log the exception or handle it appropriately
+        // Displaying the error message
         Console.WriteLine($"An error occurred while creating the admin user: {ex.Message}");
     }
 }
-
 app.Run();

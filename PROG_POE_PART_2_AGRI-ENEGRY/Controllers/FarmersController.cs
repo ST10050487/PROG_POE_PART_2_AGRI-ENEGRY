@@ -127,14 +127,22 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Controllers
             return View(farmer);
         }
 
-        public async Task<IActionResult> Edit(int? id)
+        [HttpGet]
+        [Route("[controller]/Edit/{id}")]
+        public async Task<IActionResult> Edit(string id) // Change the type of id to string
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var farmer = await _context.Farmer.FindAsync(id);
+            // Parse the id to a Guid
+            if (!Guid.TryParse(id, out Guid farmerId))
+            {
+                return NotFound();
+            }
+
+            var farmer = await _context.Farmer.FindAsync(farmerId);
             if (farmer == null)
             {
                 return NotFound();
@@ -144,9 +152,16 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,FarmerName,FarmerSurname,Age,Email,Password,PhoneNumber,Address")] Farmer farmer)
+        [Route("[controller]/Update/{id}")]
+        public async Task<IActionResult> Edit(string id, [Bind("Id,FarmerName,FarmerSurname,Age,Email,Password,PhoneNumber,Address")] Farmer farmer)
         {
-            if (id != farmer.Id)
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            // Parse the id to a Guid
+            if (!Guid.TryParse(id, out Guid farmerId))
             {
                 return NotFound();
             }
@@ -173,6 +188,9 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Controllers
             }
             return View(farmer);
         }
+
+
+
 
         public async Task<IActionResult> Delete(int? id)
         {
