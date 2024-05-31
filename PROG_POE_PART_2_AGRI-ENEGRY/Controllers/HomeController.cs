@@ -31,6 +31,10 @@ namespace PROG_POE_PART_2_AGRI_ENEGRY.Controllers
         {
             return View();
         }
+        public IActionResult EducationalResources()
+        {
+            return View();
+        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
